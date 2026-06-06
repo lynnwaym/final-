@@ -4,12 +4,28 @@
 
 ## Запуск
 
-1.Необходим .env файл:
+1. Необходим .env файл:
+
+
 TODO_PORT=7540
 TODO_DBFILE=scheduler.db
-2.поднимаем сервер: go run main.go
-3.запускаем тесты: go test ./tests -v
-4.URL сервера: http://localhost:7540
+
+
+2. поднимаем сервер: 
+
+go run main.go
+
+
+3. запускаем тесты:
+
+ go test ./tests -v
+
+
+4. URL сервера:
+
+http://localhost:7540
+
+
 ## Выполнено
 
 Выполнены базовые задачи +.env
