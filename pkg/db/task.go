@@ -25,7 +25,7 @@ func AddTask(task *Task) (int64, error) {
 
 func Tasks(limit int) ([]*Task, error) {
 
-	query := `SELECT * FROM scheduler ORDER BY date LIMIT ?`
+	query := `SELECT id, date, title, comment, repeat FROM scheduler ORDER BY date LIMIT ?`
 
 	rows, err := DB.Query(query, limit)
 	if err != nil {
@@ -42,14 +42,16 @@ func Tasks(limit int) ([]*Task, error) {
 			return nil, err
 		}
 		tasks = append(tasks, &task)
-
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
 	}
 	return tasks, nil
 }
 
 func GetTask(id string) (*Task, error) {
 	var task Task
-	query := `SELECT * FROM scheduler WHERE id = ?`
+	query := `SELECT id, date, title, comment, repeat FROM scheduler WHERE id = ?`
 
 	err := DB.QueryRow(query, id).Scan(&task.ID, &task.Date, &task.Title, &task.Comment, &task.Repeat)
 	if err != nil {

@@ -2,10 +2,13 @@ package api
 
 import (
 	"encoding/json"
-	"final_project/pkg/db"
 	"net/http"
 	"time"
+
+	"final_project/pkg/db"
 )
+
+const TasksLimit = 50
 
 func taskHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
@@ -35,7 +38,7 @@ func deleteTaskHandler(w http.ResponseWriter, r *http.Request) {
 		writeError(w, err.Error(), http.StatusNotFound)
 		return
 	}
-	writeJson(w, map[string]any{})
+	writeJson(w, map[string]any{}, http.StatusOK)
 }
 
 func getTaskHandler(w http.ResponseWriter, r *http.Request) {
@@ -49,7 +52,7 @@ func getTaskHandler(w http.ResponseWriter, r *http.Request) {
 		writeError(w, err.Error(), http.StatusNotFound)
 		return
 	}
-	writeJson(w, task)
+	writeJson(w, task, http.StatusOK)
 }
 func updTaskHandler(w http.ResponseWriter, r *http.Request) {
 	var task db.Task
@@ -98,7 +101,7 @@ func updTaskHandler(w http.ResponseWriter, r *http.Request) {
 		writeError(w, "database error", http.StatusInternalServerError)
 		return
 	}
-	writeJson(w, map[string]any{})
+	writeJson(w, map[string]any{}, http.StatusOK)
 }
 
 type TasksResp struct {
@@ -106,16 +109,21 @@ type TasksResp struct {
 }
 
 func tasksHandler(w http.ResponseWriter, r *http.Request) {
-	tasks, err := db.Tasks(50)
+	tasks, err := db.Tasks(TasksLimit)
 	if err != nil {
 		writeError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	writeJson(w, TasksResp{Tasks: tasks})
+	writeJson(w, TasksResp{Tasks: tasks}, http.StatusOK)
 
 }
 
 func doneTaskHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		writeError(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
 	id := r.URL.Query().Get("id")
 	if id == "" {
 		writeError(w, "no id specified", http.StatusBadRequest)
@@ -133,7 +141,7 @@ func doneTaskHandler(w http.ResponseWriter, r *http.Request) {
 			writeError(w, err.Error(), http.StatusNotFound)
 			return
 		}
-		writeJson(w, map[string]any{})
+		writeJson(w, map[string]any{}, http.StatusOK)
 		return
 	}
 
@@ -150,5 +158,5 @@ func doneTaskHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJson(w, map[string]any{})
+	writeJson(w, map[string]any{}, http.StatusOK)
 }

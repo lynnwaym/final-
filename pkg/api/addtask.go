@@ -2,9 +2,11 @@ package api
 
 import (
 	"encoding/json"
-	"final_project/pkg/db"
+	"log"
 	"net/http"
 	"time"
+
+	"final_project/pkg/db"
 )
 
 func addTaskHandler(w http.ResponseWriter, r *http.Request) {
@@ -12,7 +14,7 @@ func addTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&task)
 	if err != nil {
-		writeError(w, "ivalid JSON", http.StatusBadRequest)
+		writeError(w, "invalid JSON", http.StatusBadRequest)
 		return
 	}
 
@@ -54,13 +56,16 @@ func addTaskHandler(w http.ResponseWriter, r *http.Request) {
 		writeError(w, "database error", http.StatusInternalServerError)
 		return
 	}
-	writeJson(w, map[string]any{"id": id})
+	writeJson(w, map[string]any{"id": id}, http.StatusCreated)
 }
 
-func writeJson(w http.ResponseWriter, data any) {
+func writeJson(w http.ResponseWriter, data any, status int) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(data)
+	w.WriteHeader(status)
+	err := json.NewEncoder(w).Encode(data)
+	if err != nil {
+		log.Printf("JSON encode error: %v", err)
+	}
 }
 
 func writeError(w http.ResponseWriter, errMsg string, status int) {

@@ -1,10 +1,11 @@
 package server
 
 import (
-	"final_project/pkg/api"
 	"log"
 	"net/http"
 	"os"
+
+	"final_project/pkg/api"
 )
 
 func Run() error {
